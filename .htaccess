@@ -1,0 +1,7 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Si el usuario entra a la raíz de glow-fashion, redirigir internamente a public/
+    RewriteCond %{REQUEST_URI} !^/glow-fashion/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>

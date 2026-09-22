@@ -1,0 +1,530 @@
+/* RESET GENERAL */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #d1d5db;
+    color: #111111;
+    font-family: 'Georgia', serif;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* NAVBAR ALTURA Y ESTILO RÍGIDO */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #bebdbb;
+    padding: 0 60px;
+    height: 75px;
+}
+
+/* LOGO DEL HEADER QUE NO EXPANDE LA BARRA */
+.logo-container {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.logo-link {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.logo-img {
+    height: 55px !important;
+    width: auto !important;
+    max-height: 55px !important;
+    object-fit: contain !important;
+    display: block;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 35px;
+}
+
+.nav-links a {
+    font-size: 15px;
+    color: #1f2937;
+    font-family: Arial, sans-serif;
+}
+
+.btn-login-nav {
+    background-color: #7e46d6;
+    color: #ffffff !important;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px !important;
+    font-family: Arial, sans-serif;
+}
+
+/* USER DROPDOWN Y AVATAR (EN TONOS CLAROS) */
+.user-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.avatar-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background-color: #7e46d6;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 12px rgba(126, 70, 214, 0.35);
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 50px;
+    background-color: #ffffff;
+    min-width: 230px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    border: 1px solid #e5e7eb;
+    z-index: 1000;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+}
+
+.user-dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Encabezado del menú en tono claro */
+.dropdown-header {
+    padding: 14px 16px;
+    background-color: #f9fafb;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.user-label {
+    display: block;
+    font-size: 11px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 3px;
+    font-weight: 600;
+}
+
+.user-email {
+    display: block;
+    font-size: 13px;
+    color: #111827;
+    word-break: break-all;
+}
+
+/* Lista de opciones del menú */
+.dropdown-menu-list {
+    padding: 6px 0;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 18px;
+    color: #374151;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #f3e8ff;
+    color: #7e46d6;
+}
+
+.item-icon {
+    font-size: 16px;
+}
+
+/* Pie del menú (Cerrar sesión) */
+.dropdown-footer {
+    border-top: 1px solid #f3f4f6;
+    padding: 4px 0;
+}
+
+.logout-item {
+    color: #dc2626;
+}
+
+.logout-item:hover {
+    background-color: #fef2f2;
+    color: #b91c1c;
+}
+
+/* HERO SECTION */
+.hero-section {
+    display: flex;
+    justify-content: space-between;
+    background-color: #080808;
+    color: #ffffff;
+    padding: 50px 0 0 80px;
+    align-items: center;
+}
+
+.hero-title {
+    font-size: 64px;
+    font-weight: normal;
+    line-height: 1.15;
+    margin-bottom: 25px;
+}
+
+.hero-subtitle {
+    font-size: 20px;
+    color: #e5e7eb;
+    margin-bottom: 35px;
+    line-height: 1.4;
+    font-family: Arial, sans-serif;
+}
+
+.btn-hero {
+    display: inline-block;
+    background-color: #7e46d6;
+    color: #ffffff;
+    padding: 14px 32px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-family: Arial, sans-serif;
+    margin-bottom: 40px;
+}
+
+.hero-img-container img {
+    width: 100%;
+    max-width: 480px;
+    height: 420px;
+    object-fit: cover;
+    display: block;
+}
+
+/* CATEGORÍAS CUADRADAS */
+.categories-section {
+    background-color: #cbcfd8;
+    padding: 30px 60px 50px 60px;
+}
+
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 25px;
+}
+
+.category-card {
+    text-align: center;
+}
+
+.card-img-holder {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    margin-bottom: 12px;
+    background-color: #e5e7eb;
+}
+
+.card-img-holder img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.category-card h3 {
+    font-size: 13px;
+    font-weight: bold;
+    color: #1f2937;
+    font-family: Arial, sans-serif;
+    text-transform: uppercase;
+}
+
+/* SOBRE NOSOTROS */
+.about-glow-section {
+    background: linear-gradient(135deg, #1d4ed8 0%, #a855f7 60%, #c084fc 100%);
+    padding: 60px 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #ffffff;
+}
+
+.about-glow-content h2 {
+    font-size: 52px;
+    font-weight: normal;
+    line-height: 1.1;
+    margin-bottom: 25px;
+}
+
+.about-glow-content p {
+    font-size: 17px;
+    margin-bottom: 15px;
+    max-width: 500px;
+    font-family: Arial, sans-serif;
+}
+
+.btn-about {
+    display: inline-block;
+    background-color: #111111;
+    color: #ffffff;
+    padding: 14px 36px;
+    border-radius: 10px;
+    font-size: 16px;
+    margin-top: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.about-glow-card {
+    background-color: #d8b4fe;
+    width: 280px;
+    height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.about-logo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+/* ==========================================
+   ESTILOS PARA CRUDs (PRODUCTOS Y VENTAS)
+   ========================================== */
+.admin-container {
+    padding: 40px 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: Arial, sans-serif;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.admin-header h1 {
+    font-family: 'Georgia', serif;
+    font-size: 32px;
+    color: #111827;
+}
+
+.btn-primary {
+    background-color: #7e46d6;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: #6b35be;
+}
+
+.btn-secondary {
+    background-color: #e5e7eb;
+    color: #374151;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.table-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+}
+
+.crud-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.crud-table th {
+    background-color: #f9fafb;
+    padding: 14px 20px;
+    font-size: 13px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.crud-table td {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 14px;
+    color: #1f2937;
+}
+
+.badge {
+    background-color: #f3e8ff;
+    color: #7e46d6;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.status-badge.completado {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.status-badge.pendiente {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.status-badge.cancelado {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.actions-cell {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-edit {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
+.btn-edit:hover {
+    background-color: #e5e7eb;
+}
+
+.btn-delete {
+    background-color: #fef2f2;
+    color: #dc2626;
+}
+
+.btn-delete:hover {
+    background-color: #fee2e2;
+}
+
+/* VENTANA MODAL */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-box {
+    background-color: #ffffff;
+    width: 100%;
+    max-width: 500px;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.close-btn {
+    font-size: 24px;
+    cursor: pointer;
+    color: #9ca3af;
+}
+
+.crud-form .form-group {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.crud-form label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+.crud-form input, .crud-form select {
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
