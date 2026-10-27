@@ -1,27 +1,27 @@
 <?php
+// Conexión PDO única (patrón Singleton) para toda la aplicación.
+// Usa las constantes de config.php, así el nombre de la BD vive en un solo lugar.
 class Database {
-    private static $host = 'localhost';
-    private static $db_name = 'glow_fashion_db'; // Asegúrate que tenga el _db al final
-    private static $username = 'root';
-    private static $password = '';
-    private static $conn = null;
+    private static $instance = null;
+    private $conn;
 
-    public static function getConnection() {
-        if (self::$conn === null) {
-            try {
-                self::$conn = new PDO(
-                    "mysql:host=" . self::$host . ";dbname=" . self::$db_name . ";charset=utf8mb4",
-                    self::$username,
-                    self::$password,
-                    [
-                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-                    ]
-                );
-            } catch (PDOException $e) {
-                die("Error de conexión a la base de datos: " . $e->getMessage());
-            }
+    private function __construct() {
+        $dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=' . DB_CHARSET;
+        $this->conn = new PDO($dsn, DB_USER, DB_PASS, [
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES   => false,
+        ]);
+    }
+
+    public static function getInstance() {
+        if (self::$instance === null) {
+            self::$instance = new Database();
         }
-        return self::$conn;
+        return self::$instance;
+    }
+
+    public function getConnection() {
+        return $this->conn;
     }
 }

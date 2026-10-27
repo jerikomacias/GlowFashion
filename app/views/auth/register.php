@@ -1,75 +1,50 @@
 <?php include_once __DIR__ . '/../layouts/header.php'; ?>
 
-<section class="auth-section" style="padding: 60px 20px; display: flex; justify-content: center; align-items: center; min-height: 70vh; background-color: #f7f7f7;">
-    <div class="auth-box" style="background: #ffffff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 420px;">
-        <h2 style="text-align: center; color: #4b0082; margin-bottom: 25px; font-family: sans-serif;">Crear Cuenta</h2>
+<div class="auth-container" style="max-width: 480px; margin: 40px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
+    <h2 style="text-align: center; margin-bottom: 20px; color: #1f2937; font-family: serif;">Crear Cuenta - Glow Fashion</h2>
 
-        <?php if (isset($_SESSION['error'])): ?>
-            <div style="background-color: #ffe6e6; color: #d9534f; padding: 10px; border-radius: 6px; margin-bottom: 20px; text-align: center; font-size: 14px;">
-                <?php 
-                    echo $_SESSION['error']; 
-                    unset($_SESSION['error']);
-                ?>
+    <form action="/glow-fashion/index.php?url=registerProcess" method="POST">
+        <?php echo csrf_field(); ?>
+
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; color: #374151;">Nombre</label>
+            <input type="text" name="nombre" required maxlength="100" placeholder="Tu nombre" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box;">
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; color: #374151;">Apellido</label>
+            <input type="text" name="apellido" maxlength="100" placeholder="Tu apellido" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box;">
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; color: #374151;">Correo Electrónico</label>
+            <input type="email" name="email" required maxlength="150" placeholder="correo@ejemplo.com" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box;">
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; color: #374151;">Contraseña</label>
+            <div class="password-field">
+                <input type="password" name="password" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}" title="Debe contener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial." placeholder="••••••••" style="width: 100%; padding: 10px 80px 10px 10px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box;">
+                <button type="button" class="toggle-password" data-toggle-password aria-label="Mostrar contraseña" aria-pressed="false">Mostrar</button>
             </div>
-        <?php endif; ?>
+            <small style="display: block; margin-top: 5px; color: #6b7280; font-size: 12px;">
+                * La contraseña debe tener mínimo 8 caracteres, incluir una letra mayúscula, una minúscula, un número y un carácter especial.
+            </small>
+        </div>
 
-        <form action="/glow-fashion/index.php?url=registerProcess" method="POST">
-            <div style="margin-bottom: 20px;">
-                <label for="nombre" style="display: block; font-weight: bold; margin-bottom: 6px; color: #333;">Nombre Completo:</label>
-                <input type="text" id="nombre" name="nombre" required placeholder="Tu Nombre" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 15px;">
-            </div>
+        <!-- Tratamiento de datos y aviso académico -->
+        <div style="background: #f3f4f6; padding: 12px; border-radius: 6px; margin-bottom: 20px; font-size: 12px; color: #4b5563; line-height: 1.4;">
+            <strong>Aviso de Tratamiento de Datos (Fines Académicos):</strong> Este sitio web es una plataforma simulada desarrollada exclusivamente con fines académicos y educativos. Glow Fashion no está pensada para recopilar información personal real. Al registrarte, aceptas que los datos ingresados son ficticios.
+        </div>
 
-            <div style="margin-bottom: 20px;">
-                <label for="email" style="display: block; font-weight: bold; margin-bottom: 6px; color: #333;">Correo Electrónico:</label>
-                <input type="email" id="email" name="email" required placeholder="tu@email.com" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 15px;">
-            </div>
+        <button type="submit" style="width: 100%; background: #7e46d6; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 15px;">
+            Registrarse
+        </button>
+    </form>
 
-            <div style="margin-bottom: 20px;">
-                <label for="password" style="display: block; font-weight: bold; margin-bottom: 6px; color: #333;">Contraseña de Usuario:</label>
-                <input type="password" id="password" name="password" required placeholder="••••••••" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 15px;">
-            </div>
-
-            <!-- SELECCIÓN DE ROL -->
-            <div style="margin-bottom: 20px;">
-                <label for="rol" style="display: block; font-weight: bold; margin-bottom: 6px; color: #333;">Tipo de Cuenta:</label>
-                <select id="rol" name="rol" required style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 15px; background-color: #fff; cursor: pointer;">
-                    <option value="usuario">Usuario / Cliente</option>
-                    <option value="admin">Administrador</option>
-                </select>
-            </div>
-
-            <!-- CAMPO CLAVE SECRETA ADMIN (OCULTO POR DEFECTO) -->
-            <div id="adminKeyGroup" style="margin-bottom: 25px; display: none;">
-                <label for="admin_key" style="display: block; font-weight: bold; margin-bottom: 6px; color: #d9534f;">Clave Secreta de Administrador:</label>
-                <input type="password" id="admin_key" name="admin_key" placeholder="Código de acceso administrador" style="width: 100%; padding: 12px; border: 1px solid #d9534f; border-radius: 6px; box-sizing: border-box; font-size: 15px; background-color: #fff8f8;">
-            </div>
-
-            <button type="submit" class="btn-hero" style="width: 100%; border: none; padding: 14px; font-size: 16px; font-weight: bold; cursor: pointer; text-align: center; display: block; border-radius: 6px;">Registrarse</button>
-        </form>
-
-        <p style="margin-top: 20px; text-align: center; font-size: 14px; color: #555;">
-            ¿Ya tienes cuenta? <a href="/glow-fashion/index.php?url=login" style="color: #4b0082; font-weight: bold; text-decoration: underline;">Inicia sesión aquí</a>
-        </p>
-    </div>
-</section>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const rolSelect = document.getElementById('rol');
-    const adminKeyGroup = document.getElementById('adminKeyGroup');
-    const adminKeyInput = document.getElementById('admin_key');
-
-    rolSelect.addEventListener('change', function() {
-        if (this.value === 'admin') {
-            adminKeyGroup.style.display = 'block';
-            adminKeyInput.setAttribute('required', 'required');
-        } else {
-            adminKeyGroup.style.display = 'none';
-            adminKeyInput.removeAttribute('required');
-            adminKeyInput.value = '';
-        }
-    });
-});
-</script>
+    <p style="margin-top: 18px; text-align: center; font-size: 14px; color: #555;">
+        ¿Ya tienes cuenta? <a href="/glow-fashion/index.php?url=login" style="color: #4b0082; font-weight: bold;">Inicia sesión</a>
+    </p>
+</div>
 
 <?php include_once __DIR__ . '/../layouts/footer.php'; ?>

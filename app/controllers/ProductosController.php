@@ -1,6 +1,4 @@
 <?php
-require_once APPROOT . '/app/models/Product.php';
-
 class ProductosController {
     private $productModel;
 
@@ -8,43 +6,35 @@ class ProductosController {
         $this->productModel = new Product();
     }
 
-    // Muestra todos los productos o lista general
-    public function index() {
-        $productos = $this->productModel->getAllProducts();
-        $titulo = "Todas las Colecciones";
-        $subtitulo = "Explora todo nuestro catálogo urbano y de tendencia.";
-
-        require_once APPROOT . '/app/views/layouts/header.php';
-        require_once APPROOT . '/app/views/productos/index.php';
-        require_once APPROOT . '/app/views/layouts/footer.php';
-    }
-
-    // Filtra productos por categoría (/productos/categoria/{slug})
-    public function categoria($slug = '') {
-        if (empty($slug)) {
-            header('Location: ' . URLROOT . '/productos');
-            exit();
+    // Catálogo por categoría: categoria/maquillaje | categoria/ropa | categoria/accesorios
+    public function categoria($slug) {
+        $titulos = [
+            'maquillaje' => 'Maquillaje & Belleza',
+            'ropa'       => 'Colección de Ropa & Calzado',
+            'accesorios' => 'Colección de Accesorios',
+        ];
+        if (!isset($titulos[$slug])) {
+            (new HomeController())->noEncontrado();
+            return;
         }
 
-        $productos = $this->productModel->getProductsByCategorySlug($slug);
+        // Filtros opcionales de la URL, validados contra listas permitidas
+        $generosValidos = ['hombre', 'mujer', 'unisex'];
+        $tiposValidos   = ['prendas', 'zapatos', 'accesorios', 'maquillaje'];
 
-        // Títulos dinámicos según el módulo seleccionado
-        $titulos = [
-            'maquillaje'        => ['titulo' => 'Colección de Maquillaje', 'sub' => 'Resalta tu belleza única con nuestra gama de productos seleccionados.'],
-            'accesorios-hombre' => ['titulo' => 'Accesorios para Hombre', 'sub' => 'El toque distintivo que complementa tu presencia diaria.'],
-            'ropa-hombre'       => ['titulo' => 'Ropa para Hombre', 'sub' => 'Estilo urbano y de vanguardia pensado para destacar.'],
-            'ropa-mujer'        => ['titulo' => 'Ropa para Mujer', 'sub' => 'Prendas auténticas y versátiles para marcar tendencia.']
-        ];
+        $generoFiltro = $_GET['genero'] ?? 'todos';
+        $tipoFiltro   = $_GET['tipo'] ?? 'todos';
+        if (!in_array($generoFiltro, $generosValidos, true)) {
+            $generoFiltro = 'todos';
+        }
+        if (!in_array($tipoFiltro, $tiposValidos, true)) {
+            $tipoFiltro = 'todos';
+        }
 
-        $info = isset($titulos[$slug]) 
-            ? $titulos[$slug] 
-            : ['titulo' => 'Categoría: ' . ucfirst($slug), 'sub' => 'Productos seleccionados para tu estilo.'];
+        $catFiltro        = $slug;
+        $tituloCatalogo   = $titulos[$slug];
+        $productosMostrar = $this->productModel->getProductsByCategory($slug, $generoFiltro, $tipoFiltro);
 
-        $titulo = $info['titulo'];
-        $subtitulo = $info['sub'];
-
-        require_once APPROOT . '/app/views/layouts/header.php';
-        require_once APPROOT . '/app/views/productos/index.php';
-        require_once APPROOT . '/app/views/layouts/footer.php';
+        require_once __DIR__ . '/../views/productos/index.php';
     }
 }

@@ -1,29 +1,10 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+$usuario_logueado = esta_logueado();
+$nombre_display   = $_SESSION['usuario_nombre'] ?? '';
+$email_display    = $_SESSION['usuario_email'] ?? '';
+$inicial          = $nombre_display !== '' ? mb_strtoupper(mb_substr($nombre_display, 0, 1)) : 'U';
 
-// Detectar sesión guardada
-$usuario_logueado = false;
-$email_display = '';
-
-if (!empty($_SESSION['usuario'])) {
-    $usuario_logueado = true;
-    $email_display = $_SESSION['usuario'];
-} elseif (!empty($_SESSION['user_email'])) {
-    $usuario_logueado = true;
-    $email_display = $_SESSION['user_email'];
-}
-
-$inicial = !empty($email_display) ? strtoupper(substr($email_display, 0, 1)) : 'U';
-
-// Calcular total de productos en el carrito
-$cantidad_carrito = 0;
-if (!empty($_SESSION['carrito'])) {
-    foreach ($_SESSION['carrito'] as $item) {
-        $cantidad_carrito += $item['cantidad'];
-    }
-}
+$cantidad_carrito = CarritoController::contarItems();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -31,7 +12,7 @@ if (!empty($_SESSION['carrito'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Glow Fashion</title>
-    <link rel="stylesheet" href="/glow-fashion/public/css/style.css?v=6.0">
+    <link rel="stylesheet" href="<?php echo asset('css/style.css'); ?>">
 </head>
 <body>
 
@@ -44,42 +25,53 @@ if (!empty($_SESSION['carrito'])) {
 
     <nav class="nav-links">
         <a href="/glow-fashion/index.php?url=home">Inicio</a>
-        <a href="/glow-fashion/index.php?url=categoria/maquillaje">Maquillaje y Accesorios</a>
-        <a href="/glow-fashion/index.php?url=categoria/ropa">Ropa Hombre/Mujer</a>
+        <a href="/glow-fashion/index.php?url=categoria/maquillaje">Maquillaje</a>
+        <a href="/glow-fashion/index.php?url=categoria/ropa">Ropa y Zapatos</a>
+        <a href="/glow-fashion/index.php?url=categoria/accesorios">Accesorios</a>
+        <a href="#modal-tratamiento" data-modal-open="modal-tratamiento" role="button">Tratamiento de datos</a>
 
-        <!-- Botón del Carrito con Contador -->
+        <?php if ($usuario_logueado && !es_admin()): ?>
+            <a href="/glow-fashion/index.php?url=mis-compras">Mis compras</a>
+        <?php endif; ?>
+
+        <!-- Botón del Carrito -->
         <a href="/glow-fashion/index.php?url=carrito" class="btn-cart-nav" style="position: relative; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: #1f2937; font-weight: 600;">
             <span>🛒</span>
             <span>Carrito</span>
             <?php if ($cantidad_carrito > 0): ?>
-                <span class="cart-badge" style="background-color: #7e46d6; color: white; border-radius: 50%; padding: 2px 7px; font-size: 12px; font-weight: bold; font-family: sans-serif; display: inline-block; text-align: center;">
+                <span class="cart-badge" style="background-color: #7e46d6; color: white; border-radius: 50%; padding: 2px 7px; font-size: 12px; font-weight: bold; display: inline-block;">
                     <?php echo $cantidad_carrito; ?>
                 </span>
             <?php endif; ?>
         </a>
 
         <?php if ($usuario_logueado): ?>
-            <!-- MENÚ DESPLEGABLE DE USUARIO -->
             <div class="user-dropdown">
                 <button type="button" class="avatar-btn">
-                    <?php echo htmlspecialchars($inicial); ?>
+                    <?php echo e($inicial); ?>
                 </button>
-                
+
                 <div class="dropdown-content">
                     <div class="dropdown-header">
                         <span class="user-label">Conectado como</span>
-                        <strong class="user-email"><?php echo htmlspecialchars($email_display); ?></strong>
+                        <strong class="user-email"><?php echo e($email_display); ?></strong>
                     </div>
-                    
+
                     <div class="dropdown-menu-list">
-                        <a href="/glow-fashion/index.php?url=admin/productos" class="dropdown-item">
-                            <span class="item-icon">📦</span>
-                            <span>Gestionar Productos</span>
+                        <a href="/glow-fashion/index.php?url=mis-compras" class="dropdown-item">
+                            <span class="item-icon">🛍️</span>
+                            <span>Mis Compras</span>
                         </a>
-                        <a href="/glow-fashion/index.php?url=admin/ventas" class="dropdown-item">
-                            <span class="item-icon">📊</span>
-                            <span>Gestionar Ventas</span>
-                        </a>
+                        <?php if (es_admin()): ?>
+                            <a href="/glow-fashion/index.php?url=admin/productos" class="dropdown-item">
+                                <span class="item-icon">📦</span>
+                                <span>Gestionar Productos</span>
+                            </a>
+                            <a href="/glow-fashion/index.php?url=admin/ventas" class="dropdown-item">
+                                <span class="item-icon">📊</span>
+                                <span>Gestionar Ventas</span>
+                            </a>
+                        <?php endif; ?>
                     </div>
 
                     <div class="dropdown-footer">
@@ -95,3 +87,4 @@ if (!empty($_SESSION['carrito'])) {
         <?php endif; ?>
     </nav>
 </header>
+<?php render_flash(); ?>

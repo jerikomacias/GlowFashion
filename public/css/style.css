@@ -528,3 +528,95 @@ a {
     gap: 10px;
     margin-top: 20px;
 }
+
+/* ===== VENTANA "TRATAMIENTO DE DATOS" (reutiliza .modal-overlay / .modal-box) ===== */
+.modal-overlay {
+    background-color: rgba(17, 24, 39, 0.55);
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.modal-box.modal-texto {
+    max-width: 620px;
+    border-radius: 16px;
+    padding: 32px;
+    border-top: 4px solid #7e46d6;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    font-family: 'Georgia', serif;
+    animation: modal-entrada 0.25s ease;
+}
+
+.modal-box.modal-texto .modal-header {
+    border-bottom: 2px solid #f3f4f6;
+    padding-bottom: 14px;
+}
+
+.modal-box.modal-texto h2 {
+    font-family: 'Georgia', serif;
+    font-size: 26px;
+    color: #1f2937;
+}
+
+.modal-box.modal-texto p {
+    color: #4b5563;
+    font-size: 16px;
+    line-height: 1.8;
+    text-align: justify;
+    margin-bottom: 6px;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    line-height: 1;
+    padding: 0 4px;
+}
+
+.close-btn:hover {
+    color: #7e46d6;
+}
+
+@keyframes modal-entrada {
+    from { opacity: 0; transform: translateY(12px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .modal-box.modal-texto { animation: none; }
+}
+
+/* ===== BOTÓN MOSTRAR / OCULTAR CONTRASEÑA ===== */
+.password-field {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #7e46d6;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 6px;
+}
+
+.toggle-password:hover {
+    color: #4b0082;
+    text-decoration: underline;
+}
+
+
+/* Respaldo sin JavaScript: el enlace #modal-tratamiento abre la ventana con :target */
+.modal-overlay:target {
+    display: flex;
+}
+
+.btn-modal {
+    display: inline-block;
+    text-decoration: none;
+}

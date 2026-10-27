@@ -1,203 +1,144 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-$userRole = $_SESSION['user_role'] ?? 'vendedor';
-$usuarioActual = $_SESSION['usuario'] ?? $_SESSION['user_email'] ?? 'invitado';
-
-// Inicializar la lista de productos con autor/vendedor
-if (!isset($_SESSION['productos_demo'])) {
-    $_SESSION['productos_demo'] = [
-        ['id' => 1, 'nombre' => 'Labial Gloss Matte', 'categoria' => 'Maquillaje', 'precio' => 25000, 'stock' => 15, 'vendedor' => 'admin@glowfashion.com'],
-        ['id' => 2, 'nombre' => 'Chaqueta Denim Oversize', 'categoria' => 'Ropa', 'precio' => 120000, 'stock' => 8, 'vendedor' => 'vendedor@glowfashion.com'],
-        ['id' => 3, 'nombre' => 'Paleta de Sombras Nude', 'categoria' => 'Maquillaje', 'precio' => 45000, 'stock' => 10, 'vendedor' => 'vendedor2@glowfashion.com'],
-    ];
-}
-
-// PROCESAR ACCIONES (AGREGAR / EDITAR / ELIMINAR)
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_POST['action'] ?? '';
-
-    if ($action === 'guardar') {
-        $id = $_POST['id'] ?? '';
-        $nombre = trim($_POST['nombre']);
-        $categoria = $_POST['categoria'];
-        $precio = (float)($_POST['precio'] ?? 0);
-        $stock = (int)($_POST['stock'] ?? 0);
-
-        if (!empty($id)) {
-            // EDITAR PRODUCTO (Solo si es Admin o el dueño del producto)
-            foreach ($_SESSION['productos_demo'] as &$p) {
-                if ($p['id'] == $id && ($userRole === 'admin' || $p['vendedor'] === $usuarioActual)) {
-                    $p['nombre'] = $nombre;
-                    $p['categoria'] = $categoria;
-                    $p['precio'] = $precio;
-                    $p['stock'] = $stock;
-                    break;
-                }
-            }
-        } else {
-            // AGREGAR NUEVO PRODUCTO
-            $nuevoId = !empty($_SESSION['productos_demo']) ? max(array_column($_SESSION['productos_demo'], 'id')) + 1 : 1;
-            $_SESSION['productos_demo'][] = [
-                'id' => $nuevoId,
-                'nombre' => $nombre,
-                'categoria' => $categoria,
-                'precio' => $precio,
-                'stock' => $stock,
-                'vendedor' => $usuarioActual
-            ];
-        }
-        header('Location: /glow-fashion/index.php?url=admin/productos');
-        exit();
-    }
-
-    if ($action === 'eliminar') {
-        $id = (int)($_POST['id'] ?? 0);
-        $_SESSION['productos_demo'] = array_values(array_filter($_SESSION['productos_demo'], function ($p) use ($id, $userRole, $usuarioActual) {
-            if ($p['id'] === $id) {
-                return !($userRole === 'admin' || $p['vendedor'] === $usuarioActual);
-            }
-            return true;
-        }));
-        header('Location: /glow-fashion/index.php?url=admin/productos');
-        exit();
-    }
-}
-
-// FILTRAR PRODUCTOS SEGÚN EL ROL
-$todosProductos = $_SESSION['productos_demo'];
-$productos = ($userRole === 'admin') 
-    ? $todosProductos 
-    : array_filter($todosProductos, fn($p) => isset($p['vendedor']) && $p['vendedor'] === $usuarioActual);
+// Variables recibidas desde AdminController: $productos, $categorias, $imagenes
+$navActivo = 'productos';
+$estiloInput = 'width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box;';
 ?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Productos - Glow Fashion</title>
+</head>
+<body style="font-family: Arial, sans-serif; background: #f9fafb; margin: 0; padding: 0;">
 
-<?php require_once __DIR__ . '/../layouts/header.php'; ?>
+<?php require __DIR__ . '/_nav.php'; ?>
 
-<main class="admin-container">
-    <div class="admin-header">
-        <div>
-            <h1>Gestionar Productos</h1>
-            <span style="font-size: 13px; color: #6b7280;">Rol activo: <strong><?php echo strtoupper($userRole); ?></strong> (<?php echo htmlspecialchars($usuarioActual); ?>)</span>
-        </div>
-        <button class="btn-primary" onclick="toggleModal('modal-producto')">+ Nuevo Producto</button>
+<main style="max-width: 1100px; margin: 40px auto; padding: 0 20px;">
+    <h2 style="font-family: serif; color: #1f2937; margin-bottom: 25px;">Gestión de Productos</h2>
+
+    <!-- Formulario para agregar producto -->
+    <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); margin-bottom: 30px;">
+        <h3 style="margin-top: 0; margin-bottom: 15px; font-size: 18px; color: #374151;">Agregar Nuevo Producto</h3>
+        <form action="/glow-fashion/index.php?url=admin/guardar-producto" method="POST" enctype="multipart/form-data" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+            <?php echo csrf_field(); ?>
+
+            <div>
+                <label style="font-size: 13px; font-weight: 600;">Nombre del Producto</label>
+                <input type="text" name="nombre" required maxlength="150" style="<?php echo $estiloInput; ?>">
+            </div>
+            <div>
+                <label style="font-size: 13px; font-weight: 600;">Categoría</label>
+                <select name="categoria_id" required style="<?php echo $estiloInput; ?>">
+                    <?php foreach ($categorias as $c): ?>
+                        <option value="<?php echo (int)$c['id']; ?>"><?php echo e($c['nombre']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div>
+                <label style="font-size: 13px; font-weight: 600;">Género</label>
+                <select name="genero" style="<?php echo $estiloInput; ?>">
+                    <option value="unisex">Unisex</option>
+                    <option value="hombre">Hombre</option>
+                    <option value="mujer">Mujer</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-size: 13px; font-weight: 600;">Tipo</label>
+                <select name="tipo" style="<?php echo $estiloInput; ?>">
+                    <option value="prendas">Prendas</option>
+                    <option value="zapatos">Zapatos</option>
+                    <option value="accesorios">Accesorios</option>
+                    <option value="maquillaje">Maquillaje</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-size: 13px; font-weight: 600;">Precio ($)</label>
+                <input type="text" inputmode="decimal" data-moneda name="precio" required placeholder="Ej: 70.000" autocomplete="off" style="<?php echo $estiloInput; ?>">
+            </div>
+            <div>
+                <label style="font-size: 13px; font-weight: 600;">Stock / Cantidad</label>
+                <input type="number" min="0" step="1" name="stock" required style="<?php echo $estiloInput; ?>">
+            </div>
+            <div>
+                <label style="font-size: 13px; font-weight: 600;">Imagen</label>
+                <select name="imagen" style="<?php echo $estiloInput; ?>">
+                    <?php foreach ($imagenes as $img): ?>
+                        <option value="<?php echo e($img); ?>" <?php echo $img === 'logo.png' ? 'selected' : ''; ?>><?php echo e($img); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div>
+                <label style="font-size: 13px; font-weight: 600;">...o subir una imagen nueva</label>
+                <input type="file" name="imagen_archivo" accept="image/jpeg,image/png,image/webp" style="<?php echo $estiloInput; ?> background: #fff;">
+                <small style="color: #6b7280; font-size: 12px;">JPG, PNG o WEBP, máx. 3 MB. Si subes una imagen, se usa en lugar de la lista.</small>
+            </div>
+            <div style="display: flex; align-items: flex-end;">
+                <label style="font-size: 13px; font-weight: 600;">
+                    <input type="checkbox" name="destacado" value="1"> Producto destacado
+                </label>
+            </div>
+            <div style="grid-column: 1 / -1;">
+                <label style="font-size: 13px; font-weight: 600;">Descripción (opcional)</label>
+                <textarea name="descripcion" rows="2" style="<?php echo $estiloInput; ?>"></textarea>
+            </div>
+            <div style="grid-column: 1 / -1;">
+                <button type="submit" style="background: #7e46d6; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer;">Guardar Producto</button>
+            </div>
+        </form>
     </div>
 
-    <!-- Tabla de productos -->
-    <div class="table-card">
-        <table class="crud-table">
+    <!-- Tabla de productos existentes -->
+    <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); overflow-x: auto;">
+        <h3 style="margin-top: 0; margin-bottom: 15px; font-size: 18px; color: #374151;">Inventario Actual</h3>
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
             <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>PRODUCTO</th>
-                    <th>CATEGORÍA</th>
-                    <th>PRECIO</th>
-                    <th>STOCK</th>
-                    <?php if ($userRole === 'admin'): ?>
-                        <th>CREADO POR</th>
-                    <?php endif; ?>
-                    <th>ACCIONES</th>
+                <tr style="border-bottom: 2px solid #f3f4f6; color: #6b7280; font-size: 14px;">
+                    <th style="padding: 10px;">ID</th>
+                    <th style="padding: 10px;">Imagen</th>
+                    <th style="padding: 10px;">Nombre</th>
+                    <th style="padding: 10px;">Categoría</th>
+                    <th style="padding: 10px;">Género</th>
+                    <th style="padding: 10px;">Tipo</th>
+                    <th style="padding: 10px;">Precio</th>
+                    <th style="padding: 10px;">Stock</th>
+                    <th style="padding: 10px;">Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                <?php if (empty($productos)): ?>
-                    <tr>
-                        <td colspan="<?php echo ($userRole === 'admin') ? '7' : '6'; ?>" style="text-align: center; color: #6b7280; padding: 20px;">
-                            No hay productos registrados.
-                        </td>
-                    </tr>
-                <?php else: ?>
+                <?php if (!empty($productos)): ?>
                     <?php foreach ($productos as $p): ?>
-                    <tr>
-                        <td>#<?php echo $p['id']; ?></td>
-                        <td><strong><?php echo htmlspecialchars($p['nombre']); ?></strong></td>
-                        <td><span class="badge"><?php echo htmlspecialchars($p['categoria']); ?></span></td>
-                        <td>$<?php echo number_format($p['precio'], 0, ',', '.'); ?></td>
-                        <td><?php echo $p['stock']; ?> uds.</td>
-                        <?php if ($userRole === 'admin'): ?>
-                            <td><span style="font-size: 12px; background: #f3f4f6; padding: 4px 8px; border-radius: 6px; font-weight: 600; color: #4b5563;"><?php echo htmlspecialchars($p['vendedor'] ?? 'Sistema'); ?></span></td>
-                        <?php endif; ?>
-                        <td class="actions-cell">
-                            <button class="btn-sm btn-edit" onclick='editarProducto(<?php echo json_encode($p); ?>)'>Editar</button>
-                            <form action="/glow-fashion/index.php?url=admin/productos" method="POST" style="display:inline;" onsubmit="return confirm('¿Deseas eliminar este producto?');">
-                                <input type="hidden" name="action" value="eliminar">
-                                <input type="hidden" name="id" value="<?php echo $p['id']; ?>">
-                                <button type="submit" class="btn-sm btn-delete">Eliminar</button>
-                            </form>
-                        </td>
-                    </tr>
+                        <tr style="border-bottom: 1px solid #f3f4f6; font-size: 14px;<?php echo !(int)$p['activo'] ? ' opacity: 0.55;' : ''; ?>">
+                            <td style="padding: 12px;"><?php echo (int)$p['id']; ?></td>
+                            <td style="padding: 12px;"><img src="/glow-fashion/public/img/<?php echo e($p['imagen']); ?>" alt="" style="width: 48px; height: 48px; object-fit: cover; border-radius: 8px; background: #f3f4f6;"></td>
+                            <td style="padding: 12px; font-weight: 600;"><?php echo e($p['nombre']); ?><?php if (!(int)$p['activo']): ?> <span style="font-size: 11px; font-weight: 600; background: #f3f4f6; color: #6b7280; padding: 2px 8px; border-radius: 10px;">Retirado</span><?php endif; ?></td>
+                            <td style="padding: 12px;"><?php echo e($p['categoria_nombre']); ?></td>
+                            <td style="padding: 12px; text-transform: capitalize;"><?php echo e($p['genero']); ?></td>
+                            <td style="padding: 12px; text-transform: capitalize;"><?php echo e($p['tipo']); ?></td>
+                            <td style="padding: 12px;"><?php echo formatear_precio($p['precio']); ?></td>
+                            <td style="padding: 12px;<?php echo (int)$p['stock'] <= 0 ? ' color: #ef4444; font-weight: 600;' : ''; ?>"><?php echo (int)$p['stock']; ?></td>
+                            <td style="padding: 12px; white-space: nowrap;">
+                                <a href="/glow-fashion/index.php?url=admin/editar-producto&id=<?php echo (int)$p['id']; ?>" style="color: #7e46d6; font-weight: 600; text-decoration: none; margin-right: 12px;">Editar</a>
+                                <?php if ((int)$p['activo']): ?>
+                                <form action="/glow-fashion/index.php?url=admin/eliminar-producto" method="POST" data-confirm="¿Retirar este producto del catálogo? El historial de ventas se conserva. Puedes volver a activarlo con Editar." style="margin: 0; display: inline;">
+                                    <?php echo csrf_field(); ?>
+                                    <input type="hidden" name="id" value="<?php echo (int)$p['id']; ?>">
+                                    <button type="submit" style="background: none; border: none; padding: 0; color: #ef4444; font-weight: 600; cursor: pointer; font-size: 14px;">Retirar</button>
+                                </form>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
                     <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="9" style="padding: 20px; text-align: center; color: #9ca3af;">No hay productos registrados en la base de datos.</td>
+                    </tr>
                 <?php endif; ?>
             </tbody>
         </table>
     </div>
-
-    <!-- Modal Formulario Producto -->
-    <div id="modal-producto" class="modal-overlay">
-        <div class="modal-box">
-            <div class="modal-header">
-                <h3 id="modal-title">Agregar Producto</h3>
-                <span class="close-btn" onclick="toggleModal('modal-producto')">&times;</span>
-            </div>
-            <form action="/glow-fashion/index.php?url=admin/productos" method="POST" class="crud-form">
-                <input type="hidden" name="action" value="guardar">
-                <input type="hidden" name="id" id="prod-id">
-                
-                <div class="form-group">
-                    <label>Nombre del Producto</label>
-                    <input type="text" name="nombre" id="prod-nombre" required placeholder="Ej: Vestido Elegante">
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Categoría</label>
-                        <select name="categoria" id="prod-categoria" required>
-                            <option value="Maquillaje">Maquillaje y Accesorios</option>
-                            <option value="Ropa">Ropa Hombre/Mujer</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Precio ($)</label>
-                        <input type="number" name="precio" id="prod-precio" required placeholder="50000">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Stock</label>
-                        <input type="number" name="stock" id="prod-stock" required placeholder="10">
-                    </div>
-                </div>
-
-                <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="toggleModal('modal-producto')">Cancelar</button>
-                    <button type="submit" class="btn-primary">Guardar Producto</button>
-                </div>
-            </form>
-        </div>
-    </div>
 </main>
 
-<script>
-function toggleModal(id) {
-    const modal = document.getElementById(id);
-    modal.classList.toggle('active');
-    if(!modal.classList.contains('active')) {
-        document.getElementById('prod-id').value = '';
-        document.getElementById('prod-nombre').value = '';
-        document.getElementById('prod-precio').value = '';
-        document.getElementById('prod-stock').value = '';
-        document.getElementById('modal-title').innerText = 'Agregar Producto';
-    }
-}
-
-function editarProducto(prod) {
-    document.getElementById('prod-id').value = prod.id;
-    document.getElementById('prod-nombre').value = prod.nombre;
-    document.getElementById('prod-categoria').value = prod.categoria;
-    document.getElementById('prod-precio').value = prod.precio;
-    document.getElementById('prod-stock').value = prod.stock;
-    document.getElementById('modal-title').innerText = 'Editar Producto #' + prod.id;
-    toggleModal('modal-producto');
-}
-</script>
+<script src="<?php echo asset('js/main.js'); ?>"></script>
+</body>
+</html>
